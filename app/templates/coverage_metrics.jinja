@@ -1,0 +1,29 @@
+# Test Suite Coverage Metrics
+## {{ data['suite'] }}
+### Summary of normative statements coverage
+
+| Count (Suite) | Count (Spec) | Matches | Unmatched (Suite) | Unmatched (Spec) |
+| ------- | ------- | ------- | ------- | ------- |
+| {{data['suite_statements']['count']}} | {{data['spec_statements']['count']}} | {{data['matches']['count']}} |  {{data['unmatched_suite_statements']['count']}} |  {{data['unmatched_spec_statements']['count']}} |
+
+### Details
+#### Test Suite Statements
+```json
+{{data['suite_statements']['list']}}
+```
+#### Specifications Statements
+```json
+{{data['spec_statements']['list']}}
+```
+#### Matched Statements
+```json
+{{data['matches']['list']}}
+```
+#### Unmatched Test Suite Statements
+```json
+{{data['unmatched_suite_statements']['list']}}
+```
+#### Unmatched Specifications Statements
+```json
+{{data['unmatched_spec_statements']['list']}}
+```

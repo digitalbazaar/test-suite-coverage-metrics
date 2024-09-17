@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "test-suite-coverage-metrics"
+version = "0.1.0"
+description = ""
+authors = ["pstlouis <patrick.st-louis@opsecid.ca>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ruff = "^0.6.5"
+pydantic-settings = "^2.5.2"
+bs4 = "^0.0.2"
+jinja2 = "^3.1.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
