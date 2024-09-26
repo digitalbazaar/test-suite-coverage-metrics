@@ -6,7 +6,7 @@
 *This highlights features that have less than 2 passing implementations.*
 
 | Risk Score | Failed % | Failed Count | Total Count |
-| ------- | ------- | ------- | ------- | ------- |
+| ------- | ------- | ------- | ------- |
 | No Risk | 0 | 0 |  144 |
 
 #### Details
