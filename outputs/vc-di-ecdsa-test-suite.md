@@ -4,10 +4,10 @@
 ### Summary of supported features and implementations
 
 *This highlights features that have less than 2 passing implementations.*
-Risk Score: No Risk
-Failed %: 0
-Failed Count: 0
-Total Count: 144
+
+| Risk Score | Failed % | Failed Count | Total Count |
+| ------- | ------- | ------- | ------- | ------- |
+| No Risk | 0 | 0 |  144 |
 
 #### Details
 *Features with a state of pending are not considered at risk.*
