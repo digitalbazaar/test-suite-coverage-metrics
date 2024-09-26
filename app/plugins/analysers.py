@@ -5,13 +5,14 @@ from difflib import SequenceMatcher, get_close_matches
 import json
 import copy
 
-
-class SpecificationAnalyser:
-    def __init__(self):
-        self.section_classes = ['introductory', 'informative', 'appendix', 'normative']
-
+class BaseAnalyser:
     def _soup(self, url):
         return BeautifulSoup(urlopen(url).read().decode("utf-8"), "html.parser")
+
+
+class SpecificationAnalyser(BaseAnalyser):
+    def __init__(self):
+        self.section_classes = ['introductory', 'informative', 'appendix', 'normative']
     
     def _parse_statement(self, statement):
         statement = " ".join(statement.get_text().split())
@@ -101,9 +102,7 @@ class SpecificationAnalyser:
         return list(dict.fromkeys(statements))[1:]
 
 
-class TestSuiteAnalyser:
-    def _soup(self, url):
-        return BeautifulSoup(urlopen(url).read().decode("utf-8"), "html.parser")
+class TestSuiteAnalyser(BaseAnalyser):
 
     def fetch_statements(self, report_url):
         soup = self._soup(report_url)
@@ -145,4 +144,75 @@ class TestSuiteAnalyser:
                     / len(spec_statements)
                 )
             ) + ' %',
+        }
+
+class ReportsAnalyser(BaseAnalyser):
+    # def __init__(self):
+    #     self.section_classes = ['introductory', 'informative', 'appendix', 'normative']
+    def get_rows(self, report_url):
+        soup = self._soup(report_url)
+        tables = soup.findChildren('table')
+        sections = {}
+        pending_features = []
+        at_risk_features = []
+        at_risk_count = 0
+        total_count = 0
+        
+        # Skip the Key table
+        for table in tables[1:]:
+            section = table.findParent('section').get('id')
+            if 'interop' in section:
+                pass
+            else:
+                sections[section] = {}
+                table_body = table.findChildren('tbody')[0]
+                table_rows = table_body.findChildren('tr')
+                for row in table_rows:
+                    try:
+                        statement = row.findChildren('td')[0].findChildren('a')[0].string
+                    except:
+                        statement = row.findChildren('td')[0].string
+                    passed = row.findChildren('td', attrs={"class": "passed"})
+                    failed = row.findChildren('td', attrs={"class": "failed"})
+                    pending = row.findChildren('td', attrs={"class": "pending"})
+                    if len(pending) == len(row.findChildren('td')[1:]):
+                        pending_features.append(statement.strip())
+                        sections[section][statement] = {
+                            'atRisk': False,
+                            'passed': len(passed),
+                            'failed': len(failed),
+                            'pending': len(pending),
+                        }
+                    else:
+                        sections[section][statement] = {
+                            'atRisk': True if len(passed) < 2 else False,
+                            'passed': len(passed),
+                            'failed': len(failed),
+                            'pending': len(pending),
+                        }
+                        if sections[section][statement]['atRisk']:
+                            at_risk_features.append(statement.strip())
+                    at_risk_count += 1 if sections[section][statement]['atRisk'] else 0
+                    total_count += 1
+        percentage = int(100 * float(at_risk_count)/float(total_count))
+        if percentage == 0:
+            risk = 'No Risk'
+        elif percentage < 5:
+            risk = 'Low'
+        elif percentage < 10:
+            risk = 'Medium'
+        elif percentage < 20:
+            risk = 'High'
+        elif percentage < 40:
+            risk = 'Severe'
+        elif percentage > 50:
+            risk = 'Critical'
+        return {
+            'atRiskFeatures': at_risk_features,
+            'pendingFeatures': pending_features,
+            'atRiskCount': at_risk_count,
+            'totalCount': total_count,
+            'atRiskPercentage': percentage,
+            'atRiskScore': risk,
+            'results': sections
         }

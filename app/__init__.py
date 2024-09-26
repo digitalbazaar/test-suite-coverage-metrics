@@ -1,9 +1,10 @@
-from app.plugins import TestSuiteAnalyser, SpecificationAnalyser, JinjaReporter
+from app.plugins import TestSuiteAnalyser, SpecificationAnalyser, ReportsAnalyser, JinjaReporter
 from config import settings
 import json
 
 
 def run():
+        
     for suite in settings.SUITE_TO_SPEC_MAPPINGS:
         report_url = settings.TEST_SUITES[suite]
         specification_urls = [
@@ -34,6 +35,8 @@ def run():
             'count': len(spec_statements_copy),
             'list': json.dumps(spec_statements_copy, indent=2)
         }
+        risk_metrics = ReportsAnalyser().get_rows(report_url)
+        coverage_metrics['risk'] = risk_metrics
         template = JinjaReporter().render_template('coverage_metrics', coverage_metrics)
         with open(f"outputs/{suite}.md", "w+") as f:
             f.write(template)

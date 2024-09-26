@@ -1,5 +1,46 @@
 # Test Suite Coverage Metrics
 ## vc-bitstring-status-list-test-suite
+
+### Summary of supported features and implementations
+
+*This highlights features that have less than 2 passing implementations.*
+Risk Score: Critical
+Failed %: 65
+Failed Count: 15
+Total Count: 23
+
+#### Details
+*Features with a state of pending are not considered at risk.*
+
+##### At Risk Features
+
+- Any expression of the data model in this section MUST be expressed in a conforming verifiable credential as defined in [VC-DATA-MODEL-2.0].
+- If present, the id value is expected to be a URL that identifies the status information associated with the verifiable credential. It MUST NOT be the URL for the status list.
+- The type property MUST be BitstringStatusListEntry.
+- The purpose of the status entry MUST be a string.
+- The statusListIndex property MUST be an arbitrary size integer greater than or equal to 0, expressed as a string in base 10.
+- The statusListCredential property MUST be a URL to a verifiable credential.
+- When the URL is dereferenced, the resulting verifiable credential MUST have type property that includes the BitstringStatusListCredential value.
+- When a status list verifiable credential is published, it MUST be a conforming document, as defined in [VC-DATA-MODEL-2.0].
+- The verifiable credential that contains the status list MUST express a type property that includes the BitstringStatusListCredential value.
+- The type of the credential subject, which is the status list, MUST be BitstringStatusList.
+- The value of the purpose property of the status entry, statusPurpose, MUST be one or more strings.
+- The encodedList property of the credential subject MUST be a Multibase-encoded base64url (with no padding) [RFC4648] representation of the GZIP-compressed [RFC1952] bitstring values for the associated range of verifiable credential status values.
+- The uncompressed bitstring MUST be at least 16KB in size.
+- ACA-py
+- Digital Bazaar
+
+##### Pending Features
+
+- If present, statusSize MUST be an integer greater than zero.
+- If statusSize is provided and is greater than 1, then the property credentialStatus.statusMessage MUST be present.
+- The number of status messages MUST equal the number of possible values.
+- If present, the statusMessage property MUST be an array, the length of which MUST equal the number of possible status messages indicated by statusSize.
+- statusMessage MAY be present if statusSize is 1, and MUST be present if statusSize is greater than 1.
+- If the statusMessage array is present, each element MUST contain the two properties "status" and "message".
+- If present, the "statusReference" value MUST be a URL or an array of URLs [URL] which dereference(s) to material related to the status.
+- The bitstring MUST be encoded such that the first index, with a value of zero (0), is located at the left-most bit in the bitstring and the last index, with a value of one less than the length of the bitstring (bitstring_length - 1), is located at the right-most bit in the bitstring.
+
 ### Summary of normative statements coverage
 
 | Count (Suite) | Count (Spec) | Matches | Unmatched (Suite) | Unmatched (Spec) |

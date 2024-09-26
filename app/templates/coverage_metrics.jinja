@@ -1,5 +1,25 @@
 # Test Suite Coverage Metrics
 ## {{ data['suite'] }}
+
+### Summary of supported features and implementations
+
+*This highlights features that have less than 2 passing implementations.*
+Risk Score: {{ data['risk']['atRiskScore'] }}
+Failed %: {{ data['risk']['atRiskPercentage'] }}
+Failed Count: {{ data['risk']['atRiskCount'] }}
+Total Count: {{ data['risk']['totalCount'] }}
+
+#### Details
+*Features with a state of pending are not considered at risk.*
+
+##### At Risk Features
+{% for feature in data['risk']['atRiskFeatures'] %}
+- {{feature}}{% endfor %}
+
+##### Pending Features
+{% for feature in data['risk']['pendingFeatures'] %}
+- {{feature}}{% endfor %}
+
 ### Summary of normative statements coverage
 
 | Count (Suite) | Count (Spec) | Matches | Unmatched (Suite) | Unmatched (Spec) |
