@@ -4,7 +4,7 @@
 
 | Count (Suite) | Count (Spec) | Matches | Unmatched (Suite) | Unmatched (Spec) |
 | ------- | ------- | ------- | ------- | ------- |
-| 21 | 39 | 18 |  3 |  21 |
+| 31 | 40 | 25 |  6 |  8 |
 
 ### Details
 #### Test Suite Statements
@@ -22,20 +22,31 @@
   "The number of status messages MUST equal the number of possible values.",
   "If present, the statusMessage property MUST be an array, the length of which MUST equal the number of possible status messages indicated by statusSize.",
   "statusMessage MAY be present if statusSize is 1, and MUST be present if statusSize is greater than 1.",
-  "If the statusMessage array is present, each element MUST contain the two properties \"status\" and \"message\".",
-  "If present, the \"statusReference\" value MUST be a URL or an array of URLs [URL] which dereference(s) to material related to the status.",
+  "If the statusMessage array is present, each element MUST contain the two properties 'status' and 'message'.",
+  "If present, the 'statusReference' value MUST be a URL or an array of URLs [URL] which dereference(s) to material related to the status.",
   "When a status list verifiable credential is published, it MUST be a conforming document, as defined in [VC-DATA-MODEL-2.0].",
   "The verifiable credential that contains the status list MUST express a type property that includes the BitstringStatusListCredential value.",
   "The type of the credential subject, which is the status list, MUST be BitstringStatusList.",
   "The value of the purpose property of the status entry, statusPurpose, MUST be one or more strings.",
   "The encodedList property of the credential subject MUST be a Multibase-encoded base64url (with no padding) [RFC4648] representation of the GZIP-compressed [RFC1952] bitstring values for the associated range of verifiable credential status values.",
   "The uncompressed bitstring MUST be at least 16KB in size.",
-  "The bitstring MUST be encoded such that the first index, with a value of zero (0), is located at the left-most bit in the bitstring and the last index, with a value of one less than the length of the bitstring (bitstring_length - 1), is located at the right-most bit in the bitstring."
+  "The bitstring MUST be encoded such that the first index, with a value of zero (0), is located at the left-most bit in the bitstring and the last index, with a value of one less than the length of the bitstring (bitstring_length - 1), is located at the right-most bit in the bitstring.",
+  "If an implementation of any of the algorithms in this section processes a property defined in Section 2. Data Model whose value is malformed due to not complying with associated 'MUST' statements, a MALFORMED_VALUE_ERROR MUST be raised.",
+  "The following process, or one generating the exact output, MUST be followed when producing a BitstringStatusListCredential.",
+  "The following process, or one generating the exact output, MUST be followed when validating a verifiable credential that is contained in a BitstringStatusListCredential",
+  "If the credentialIndex multiplied by the size is a value outside of the range of the bitstring, a RANGE_ERROR MUST be raised.",
+  "When a statusListCredential URL is dereferenced, server implementations MAY provide a mechanism to dereference the status list as of a particular point in time If such a feature is supported, and if query parameters are supported by the URL scheme, then the name of the query parameter MUST be timestamp and the value MUST be a valid URL-encoded [XMLSCHEMA11-2] dateTimeStamp string value.",
+  "The result of dereferencing such a timestamp-parameterized URL MUST be either a status list credential containing the status list as it existed at the given point in time, or a STATUS_RETRIEVAL_ERROR.",
+  "The following process, or one generating the exact output, MUST be followed when generating a status list bitstring.",
+  "The following process, or one generating the exact output, MUST be followed when expanding a compressed status list bitstring.",
+  "The type value of the error object MUST be a URL that starts with the value https://www.w3.org/ns/credentials/status-list# and ends with the value in the section listed below.",
+  "If an implementation of any of the algorithms in this section processes a property defined in Section 2. Data Model whose value is malformed due to not complying with associated 'MUST' statements, a MALFORMED_VALUE_ERROR MUST be raised."
 ]
 ```
 #### Specifications Statements
 ```json
 [
+  "The key words MAY, MUST, MUST NOT, SHOULD, and SHOULD NOT in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals, as shown here.",
   "Conforming processors MUST produce errors when non-conforming documents are consumed.",
   "Any expression of the data model in this section MUST be expressed in a conforming verifiable credential as defined in [VC-DATA-MODEL-2.0].",
   "It MUST NOT be the URL for the status list",
@@ -106,7 +117,7 @@
   ],
   [
     "If present, its value MUST be a URL or an array of URLs [URL] which dereference to material related to the status",
-    "If present, the \"statusReference\" value MUST be a URL or an array of URLs [URL] which dereference(s) to material related to the status."
+    "If present, the 'statusReference' value MUST be a URL or an array of URLs [URL] which dereference(s) to material related to the status."
   ],
   [
     "The verifiable credential that contains the status list MUST express a type property that includes the BitstringStatusListCredential value.",
@@ -125,6 +136,22 @@
     "The bitstring MUST be encoded such that the first index, with a value of zero (0), is located at the left-most bit in the bitstring and the last index, with a value of one less than the length of the bitstring (bitstring_length - 1), is located at the right-most bit in the bitstring."
   ],
   [
+    "The following process, or one generating the exact output, MUST be followed when producing a BitstringStatusListCredential",
+    "The following process, or one generating the exact output, MUST be followed when producing a BitstringStatusListCredential."
+  ],
+  [
+    "If the credentialIndex multiplied by the size is a value outside of the range of the bitstring, a RANGE_ERROR MUST be raised.",
+    "If the credentialIndex multiplied by the size is a value outside of the range of the bitstring, a RANGE_ERROR MUST be raised."
+  ],
+  [
+    "The result of dereferencing such a timestamp-parameterized URL MUST be either a status list credential containing the status list as it existed at the given point in time, or a STATUS_RETRIEVAL_ERROR",
+    "The result of dereferencing such a timestamp-parameterized URL MUST be either a status list credential containing the status list as it existed at the given point in time, or a STATUS_RETRIEVAL_ERROR."
+  ],
+  [
+    "The following process, or one generating the exact output, MUST be followed when expanding a compressed status list bitstring",
+    "The following process, or one generating the exact output, MUST be followed when generating a status list bitstring."
+  ],
+  [
     "The purpose of the status entry MUST be a string",
     "The purpose of the status entry MUST be a string."
   ],
@@ -138,7 +165,7 @@
   ],
   [
     "If the statusMessage array is present, each element MUST contain the two properties described below, and MAY contain additional properties",
-    "If the statusMessage array is present, each element MUST contain the two properties \"status\" and \"message\"."
+    "If the statusMessage array is present, each element MUST contain the two properties 'status' and 'message'."
   ],
   [
     "The type of the credential subject, which is the status list, MUST be BitstringStatusList.",
@@ -149,8 +176,20 @@
     "The uncompressed bitstring MUST be at least 16KB in size."
   ],
   [
+    "The following process, or one generating the exact output, MUST be followed when validating a verifiable credential that is contained in a BitstringStatusListCredential",
+    "The following process, or one generating the exact output, MUST be followed when validating a verifiable credential that is contained in a BitstringStatusListCredential"
+  ],
+  [
+    "The following process, or one generating the exact output, MUST be followed when generating a status list bitstring",
+    "The following process, or one generating the exact output, MUST be followed when expanding a compressed status list bitstring."
+  ],
+  [
     "When a status list verifiable credential is published, it MUST be a conforming document, as defined in [VC-DATA-MODEL-2.0], that expresses the data model in this section",
     "When a status list verifiable credential is published, it MUST be a conforming document, as defined in [VC-DATA-MODEL-2.0]."
+  ],
+  [
+    "The type value of the error object MUST be a URL that starts with the value https://www.w3.org/ns/credentials/status-list# and ends with the value in the section listed below.",
+    "The type value of the error object MUST be a URL that starts with the value https://www.w3.org/ns/credentials/status-list# and ends with the value in the section listed below."
   ]
 ]
 ```
@@ -159,7 +198,10 @@
 [
   "If present, the id value is expected to be a URL that identifies the status information associated with the verifiable credential. It MUST NOT be the URL for the status list.",
   "The number of status messages MUST equal the number of possible values.",
-  "If present, the statusMessage property MUST be an array, the length of which MUST equal the number of possible status messages indicated by statusSize."
+  "If present, the statusMessage property MUST be an array, the length of which MUST equal the number of possible status messages indicated by statusSize.",
+  "If an implementation of any of the algorithms in this section processes a property defined in Section 2. Data Model whose value is malformed due to not complying with associated 'MUST' statements, a MALFORMED_VALUE_ERROR MUST be raised.",
+  "When a statusListCredential URL is dereferenced, server implementations MAY provide a mechanism to dereference the status list as of a particular point in time If such a feature is supported, and if query parameters are supported by the URL scheme, then the name of the query parameter MUST be timestamp and the value MUST be a valid URL-encoded [XMLSCHEMA11-2] dateTimeStamp string value.",
+  "If an implementation of any of the algorithms in this section processes a property defined in Section 2. Data Model whose value is malformed due to not complying with associated 'MUST' statements, a MALFORMED_VALUE_ERROR MUST be raised."
 ]
 ```
 #### Unmatched Specifications Statements
@@ -167,24 +209,11 @@
 [
   "Conforming processors MUST produce errors when non-conforming documents are consumed.",
   "It MUST NOT be the URL for the status list",
-  "While the value of the string is arbitrary, the following values MUST be used for their intended purpose: Value Description revocation Used to cancel the validity of a verifiable credential",
-  "If statusSize is not present as a property of the credentialStatus, then statusSize MUST be processed as 1",
   "If present, the statusMessage property MUST be an array, the length of which MUST equal the number of possible status messages indicated by statusSize (e.g., statusMessage array MUST have 2 elements if statusSize has 1 bit, 4 elements if statusSize has 2 bits, 8 elements if statusSize has 3 bits, etc.)",
-  "One way to resolve this conflict is to remove ttl and specify that caching behavior can be expressed using protocol mechanisms (such as the expires header in HTTP), and that any caching performed MUST align with the validUntil value for the verifiable credential",
-  "While the value of each string is arbitrary, the following values MUST be used for their intended purpose: Value Description revocation Used to cancel the validity of a verifiable credential",
   "The status message descriptions MUST be defined in credentialSubject.statusMessages",
   "credentialSubject.statusSize MUST be specified when this statusPurpose value is used.",
-  "If not present, implementers MUST use a value of 300000 for this property",
-  "A verifier MUST NOT use a cached BitstringStatusListCredential that was cached for more than the ttl duration prior to the start of verification operation on a verifiable credential",
   "Data Model whose value is malformed due to not complying with associated 'MUST' statements, a MALFORMED_VALUE_ERROR MUST be raised.",
-  "The following process, or one generating the exact output, MUST be followed when producing a BitstringStatusListCredential",
-  "The following process, or one generating the exact output, MUST be followed when validating a verifiable credential that is contained in a BitstringStatusListCredential",
-  "If the credentialIndex multiplied by the size is a value outside of the range of the bitstring, a RANGE_ERROR MUST be raised.",
   "If such a feature is supported, and if query parameters are supported by the URL scheme, then the name of the query parameter MUST be timestamp and the value MUST be a valid URL-encoded [XMLSCHEMA11-2] dateTimeStamp string value",
-  "The result of dereferencing such a timestamp-parameterized URL MUST be either a status list credential containing the status list as it existed at the given point in time, or a STATUS_RETRIEVAL_ERROR",
-  "The following process, or one generating the exact output, MUST be followed when generating a status list bitstring",
-  "The following process, or one generating the exact output, MUST be followed when expanding a compressed status list bitstring",
-  "The type value of the error object MUST be a URL that starts with the value https://www.w3.org/ns/credentials/status-list# and ends with the value in the section listed below.",
   "The code value MUST be the integer code described in the table below (in parentheses, beside the type name)."
 ]
 ```

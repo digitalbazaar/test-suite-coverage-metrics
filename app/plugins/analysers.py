@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup, SoupStrainer
 from difflib import SequenceMatcher, get_close_matches
 import json
 import copy
+from pprint import pprint
 
 
 class SpecificationAnalyser:
@@ -81,24 +82,46 @@ class SpecificationAnalyser:
     def fetch_statements(self, spec_url):
         soup = self._soup(spec_url)
         statements = []
-        # statements = SoupStrainer('em',{'class': 'rfc2119'})
         parent_tags = list(
             dict.fromkeys(
                 [tag.find_parent() for tag in soup.find_all("em", {"class": "rfc2119"})]
             )
         )
-
+        
         for tag in parent_tags:
-            tag_statements = " ".join(tag.get_text().split())
-            tag_statements = tag_statements.replace('"', "'")
-            tag_statements = tag_statements.split(". ")
+            tag_statements = " ".join(tag.get_text().split()).replace('"', "'").split(". ")
             for item in tag_statements.copy():
-                # keywords = ["MAY", "MUST", "REQUIRED", "OPTIONAL", "SHOULD"]
+                # "MAY", "MUST", "REQUIRED", "OPTIONAL", "SHOULD"
                 keywords = ["MUST", "REQUIRED"]
                 if all(word not in item for word in keywords):
                     tag_statements.remove(item)
             statements += tag_statements
-        return list(dict.fromkeys(statements))[1:]
+            
+        return list(dict.fromkeys(statements))#[1:]
+        
+            
+
+    # def fetch_statements(self, spec_url):
+    #     soup = self._soup(spec_url)
+    #     statements = []
+    #     # statements = SoupStrainer('em',{'class': 'rfc2119'})
+    #     parent_tags = list(
+    #         dict.fromkeys(
+    #             [tag.find_parent() for tag in soup.find_all("em", {"class": "rfc2119"})]
+    #         )
+    #     )
+
+    #     for tag in parent_tags:
+    #         tag_statements = " ".join(tag.get_text().split())
+    #         tag_statements = tag_statements.replace('"', "'")
+    #         tag_statements = tag_statements.split(". ")
+    #         for item in tag_statements.copy():
+    #             # keywords = ["MAY", "MUST", "REQUIRED", "OPTIONAL", "SHOULD"]
+    #             keywords = ["MUST", "REQUIRED"]
+    #             if all(word not in item for word in keywords):
+    #                 tag_statements.remove(item)
+    #         statements += tag_statements
+    #     return list(dict.fromkeys(statements))[1:]
 
 
 class TestSuiteAnalyser:
@@ -108,19 +131,19 @@ class TestSuiteAnalyser:
     def fetch_statements(self, report_url):
         soup = self._soup(report_url)
         test_suite_statements = [
-            tag.text for tag in soup.find(id="conformance").find_all("a")
+            tag.text.replace('"', "'") for tag in soup.find(id="conformance").find_all("a")
         ]
         return test_suite_statements
 
-    def match_statements(self, suite_statements, combined_spec_statements):
+    def match_statements(self, suite_statements, spec_statements):
         matches = []
         for x in range(5):
-            for spec_statement in combined_spec_statements:
-                for test_statement in suite_statements:
-                    if SequenceMatcher(None, spec_statement, test_statement).ratio() >= 0.75:
-                        matches.append((spec_statement,test_statement))
-                        suite_statements.remove(test_statement)
-                        combined_spec_statements.remove(spec_statement)
+            for spec_statement in spec_statements:
+                for suite_statement in suite_statements:
+                    if SequenceMatcher(None, spec_statement, suite_statement).ratio() >= 0.75:
+                        matches.append((spec_statement,suite_statement))
+                        suite_statements.remove(suite_statement)
+                        spec_statements.remove(spec_statement)
                         break
         return matches
     
@@ -128,21 +151,21 @@ class TestSuiteAnalyser:
         return {
             'spec_statements': {
                 'count': len(spec_statements),
-                'list': json.dumps(spec_statements, indent=2),
+                'list': spec_statements,
             },
             'suite_statements': {
                 'count': len(suite_statements),
-                'list': json.dumps(suite_statements, indent=2),
+                'list': suite_statements,
             },
             'matches': {
                 'count': len(matches),
-                'list': json.dumps(matches, indent=2)
+                'list': matches
             },
-            'coverage': str(
-                int(
-                    100
-                    * (len(spec_statements) - (len(spec_statements)-len(matches)))
-                    / len(spec_statements)
-                )
-            ) + ' %',
+            # 'coverage': str(
+            #     int(
+            #         100
+            #         * (len(spec_statements) - (len(spec_statements)-len(matches)))
+            #         / len(spec_statements)
+            #     )
+            # ) + ' %',
         }

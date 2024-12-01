@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<body>
+
+
+<canvas id="vc-data-model-2.0-test-suite" style="width:100%;max-width:600px"></canvas>
+<script>
+var xValues = [
+    "Specification", 
+    "Test-Suite", 
+    "Skipped", 
+    "Matched", 
+    "Unmatched"
+];
+var yValues = [
+    91, 
+    75, 
+    6, 
+    46, 
+    12
+];
+var barColors = [
+  "#b91d47",
+  "#00aba9",
+  "#2b5797",
+  "#e8c3b9",
+  "#1e7145"
+];
+
+new Chart("vc-data-model-2.0-test-suite", {
+  type: "pie",
+  data: {
+    labels: xValues,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yValues
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      text: "vc-data-model-2.0-test-suite"
+    }
+  }
+});
+</script>
+
+
+</body>
+</html>

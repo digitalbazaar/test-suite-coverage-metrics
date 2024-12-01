@@ -1,0 +1,49 @@
+# Copyright 2023 Digital Bazaar, Inc.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+name: Generate Coverage Metrics
+
+on:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - name: Run eslint
+        run: npm run lint
+
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install project
+        run: poetry install
+      - name: Run test with Node.js ${{ matrix.node-version }}
+        run: python main.py
+      - name: Deploy to Github Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages
+          folder: reports
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Report Github Pages Deployment Status
+        run: echo $deployment_status
